@@ -1,26 +1,30 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
-const cors = require('cors'); // ✅ Added CORS
+const cors = require('cors');
+const Message = require('./models/Message');
 
-const Message = require('./models/Message'); // Make sure path is correct
 const app = express();
-
 dotenv.config();
 
-// ✅ Enable CORS for GitHub Pages
+// ✅ Allow GitHub Pages frontend to access this API
 app.use(cors({
-  origin: "https://devnovamike.github.io"
+  origin: "https://devnovamike.github.io",
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type']
 }));
 
-app.use(express.json()); // for parsing application/json
+// ✅ Ensure OPTIONS preflight requests are handled
+app.options('*', cors());
 
-// Connect to MongoDB
+app.use(express.json());
+
+// ✅ Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected successfully!'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// 🟢 POST route to save messages
+// ✅ POST /api/contact route
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, message } = req.body;

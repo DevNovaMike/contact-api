@@ -1,10 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
+const cors = require('cors'); // ✅ Added CORS
+
 const Message = require('./models/Message'); // Make sure path is correct
 const app = express();
 
 dotenv.config();
+
+// ✅ Enable CORS for GitHub Pages
+app.use(cors({
+  origin: "https://devnovamike.github.io"
+}));
 
 app.use(express.json()); // for parsing application/json
 

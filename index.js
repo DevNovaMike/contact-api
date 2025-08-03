@@ -7,24 +7,19 @@ const Message = require('./models/Message');
 const app = express();
 dotenv.config();
 
-// ✅ Allow GitHub Pages frontend to access this API
+// ✅ Basic safe CORS config
 app.use(cors({
-  origin: "https://devnovamike.github.io",
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type']
+  origin: "https://devnovamike.github.io"
 }));
 
-// ✅ Ensure OPTIONS preflight requests are handled
-app.options('*', cors());
+app.use(express.json()); // parses JSON bodies
 
-app.use(express.json());
-
-// ✅ Connect to MongoDB
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('✅ MongoDB connected successfully!'))
   .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// ✅ POST /api/contact route
+// ✅ Save messages
 app.post('/api/contact', async (req, res) => {
   try {
     const { name, email, message } = req.body;
@@ -32,8 +27,14 @@ app.post('/api/contact', async (req, res) => {
     await newMessage.save();
     res.status(201).json({ message: 'Message saved successfully!' });
   } catch (err) {
+    console.error('❌ Error saving message:', err);
     res.status(500).json({ error: 'Failed to save message.' });
   }
+});
+
+// ✅ Add a GET route to verify API is up
+app.get('/', (req, res) => {
+  res.send('✅ Contact API is running!');
 });
 
 const PORT = process.env.PORT || 3000;
